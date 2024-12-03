@@ -109,3 +109,8 @@ for i in range(12):
 app.grid_columnconfigure(0, weight=1)
 
 app.mainloop()
+
+# TODO:
+# Make part version + Model Version as enum
+# Make enum for Part name (check the picture in whatsapp)
+# Make a new enum of manufacture (3D,Sponsors, CNC, Manuel)
