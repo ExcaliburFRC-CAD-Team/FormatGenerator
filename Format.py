@@ -62,22 +62,30 @@ class FormatId:
     def get_manufacture(self):
         return self.manufacture_method if self.model_type != "Main_Assembly" else ""
 
+    class CadId:
+        def __init__(self, system_name, model_type, model_order, model_version):
+            self.system_name = system_name
+            self.model_type = model_type
+            self.model_order = model_order
+            self.model_version = model_version
 
-class CadId:
-    def __init__(self, type, model_type, model_order, model_version):
-        self.type = type
-        self.model_type = model_type
-        self.model_order = model_order
-        self.model_version = model_version
+        def get_id(self):
+            i = "0"
+            ii = "0"
 
-    def get_cad_id(self):
-        year = datetime.now().year
-        id_part = "0"
-        if self.model_type == "Main_Assembly":
-            id_part = "0"
-        elif self.model_type in ["Sub_Assembly", "Part"]:
-            id_part = self.model_order.zfill(2)  # Ensure model_order is two digits
-        return f"{year}-{self.type}-{id_part}{self.model_version.zfill(1)}"  # Ensure model_version is one digit
+            if self.model_type == "Main_Assembly":
+                return i + ii
+            elif self.model_type == "Sub_Assembly":
+                i = self.model_order
+            elif self.model_type == "Part":
+                ii = self.model_order
+
+            return i + ii
+
+        def get_cad_id(self):
+            space = "-"
+            year = datetime.now().year
+            return f"{year}{space}{self.system_name}{space}{self.get_id()}{self.model_version}"
 
 
 class FormatGeneratorApp(ctk.CTk):
@@ -99,7 +107,8 @@ class FormatGeneratorApp(ctk.CTk):
 
     def create_widgets(self):
         ctk.CTkLabel(self, text="System Name:").pack(pady=5, fill="x")
-        ctk.CTkComboBox(self, variable=self.system_name_var, values=["Robot", "Block_bots", "Prototype", "SYSTEMS1"]).pack(
+        ctk.CTkComboBox(self, variable=self.system_name_var,
+                        values=["Robot", "Block_bots", "Prototype", "SYSTEMS1"]).pack(
             pady=5, fill="x"
         )
 
@@ -188,19 +197,18 @@ class FormatGeneratorApp(ctk.CTk):
 
             self.manufacture_method_label.pack(pady=5, fill="x")
             self.manufacture_method_combo.pack(pady=5
-        ,fill="x")
+                                               , fill="x")
 
     def generate_format(self):
         format_id = FormatId(
-            self.model_type_var.get(),
-            self.parts_name_var.get(),
-            self.motor_var.get(),
-            self.plate_var.get(),
-            self.manufacture_method_var.get(),
+            self.model_type_var.get().strip(),
+            self.parts_name_var.get().strip(),
+            self.motor_var.get().strip(),
+            self.plate_var.get().strip(),
+            self.manufacture_method_var.get().strip(),
             self.width_var.get()
         )
-
-        cad_id = CadId(
+        cad_id = FormatId.CadId(
             self.system_name_var.get(),
             self.model_type_var.get(),
             self.model_order_var.get(),
