@@ -1,10 +1,9 @@
 import customtkinter as ctk
-from tkinter import messagebox  # Import messagebox for displaying results
+from tkinter import messagebox
 from datetime import datetime
-import pyperclip  # For copying to clipboard
+import pyperclip
 
 
-# Define the FormatId class
 class FormatId:
     class PartsName:
         PLATE = "PLATE"
@@ -48,7 +47,8 @@ class FormatId:
             return ""
         part = self.get_part()
         manufacture = self.get_manufacture()
-        return f"{part}-{manufacture}" if part else manufacture
+        result = f"{part}-{manufacture}" if part else manufacture
+        return result.rstrip('-').rstrip('--')
 
     def get_part(self):
         if self.parts_name == self.PartsName.PLATE and self.plate == self.Plate.ALUMINIUM:
@@ -63,7 +63,6 @@ class FormatId:
         return self.manufacture_method if self.model_type != "Main_Assembly" else ""
 
 
-# Define the CadId class
 class CadId:
     def __init__(self, type, model_type, model_order, model_version):
         self.type = type
@@ -76,23 +75,18 @@ class CadId:
         id_part = "0"
         if self.model_type == "Main_Assembly":
             id_part = "0"
-        elif self.model_type == "Sub_Assembly":
-            id_part = self.model_order
-        elif self.model_type == "Part":
-            id_part = self.model_order
-        return f"{year}-{self.type}-{id_part + self.model_version}"
+        elif self.model_type in ["Sub_Assembly", "Part"]:
+            id_part = self.model_order.zfill(2)  # Ensure model_order is two digits
+        return f"{year}-{self.type}-{id_part}{self.model_version.zfill(1)}"  # Ensure model_version is one digit
 
 
-# Define the main application class
 class FormatGeneratorApp(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("Format Generator")
-        self.geometry("400x600")
-
-        # Create input fields
-        self.system_name_var = ctk.StringVar(value="SYSTEMS1")
-        self.model_type_var = ctk.StringVar(value="Part")
+        self.geometry("400x700")
+        self.system_name_var = ctk.StringVar(value="Robot")
+        self.model_type_var = ctk.StringVar(value="Main_Assembly")
         self.model_order_var = ctk.StringVar(value="1")
         self.model_version_var = ctk.StringVar(value="1")
         self.parts_name_var = ctk.StringVar(value="PLA")
@@ -101,28 +95,28 @@ class FormatGeneratorApp(ctk.CTk):
         self.width_var = ctk.IntVar(value=-1)
         self.manufacture_method_var = ctk.StringVar(value="CNC")
 
-        # Create GUI elements
         self.create_widgets()
 
     def create_widgets(self):
         ctk.CTkLabel(self, text="System Name:").pack(pady=5, fill="x")
-        ctk.CTkComboBox(self, variable=self.system_name_var, values=["SYSTEMS1", "SYSTEMS2", "SYSTEMS3"]).pack(
+        ctk.CTkComboBox(self, variable=self.system_name_var, values=["Robot", "Block_bots", "Prototype", "SYSTEMS1"]).pack(
             pady=5, fill="x"
         )
 
         ctk.CTkLabel(self, text="Model Type:").pack(pady=5, fill="x")
         ctk.CTkComboBox(
-            self, variable=self.model_type_var, values=["Main_Assembly", "Sub_Assembly", "Part"],
+            self, variable=self.model_type_var, values=["Main_Assembly", "Sub_Assembly ", "Part"],
             command=self.update_widgets
         ).pack(pady=5, fill="x")
 
         ctk.CTkLabel(self, text="Model Order:").pack(pady=5, fill="x")
-        ctk.CTkComboBox(self, variable=self.model_order_var, values=[str(i) for i in range(1, 10)]).pack(pady=5, fill="x")
+        ctk.CTkComboBox(self, variable=self.model_order_var, values=[str(i) for i in range(1, 10)]).pack(pady=5,
+                                                                                                         fill="x")
 
         ctk.CTkLabel(self, text="Model Version:").pack(pady=5, fill="x")
-        ctk.CTkComboBox(self, variable=self.model_version_var, values=[str(i) for i in range(1, 10)]).pack(pady=5, fill="x")
+        ctk.CTkComboBox(self, variable=self.model_version_var, values=[str(i) for i in range(1, 10)]).pack(pady=5,
+                                                                                                           fill="x")
 
-        # Widgets for Part-specific options
         self.parts_name_label = ctk.CTkLabel(self, text="Parts Name:")
         self.motor_label = ctk.CTkLabel(self, text="Motor:")
         self.plate_label = ctk.CTkLabel(self, text="Plate:")
@@ -150,13 +144,15 @@ class FormatGeneratorApp(ctk.CTk):
         self.generate_button = ctk.CTkButton(self.bottom_frame, text="Generate Format", command=self.generate_format)
         self.generate_button.pack(fill="x", padx=10)
 
+        self.refresh_button = ctk.CTkButton(self.bottom_frame, text="Refresh", command=self.refresh)
+        self.refresh_button.pack(fill="x", padx=10, pady=5)
+
         self.update_widgets()
 
     def update_widgets(self, *args):
         model_type = self.model_type_var.get()
         parts_name = self.parts_name_var.get()
         plate = self.plate_var.get()
-
         # Reset widgets
         self.parts_name_label.pack_forget()
         self.parts_name_combo.pack_forget()
@@ -168,46 +164,56 @@ class FormatGeneratorApp(ctk.CTk):
         self.width_entry.pack_forget()
         self.manufacture_method_label.pack_forget()
         self.manufacture_method_combo.pack_forget()
-
+        # Only show parts_name, motor, plate, and width if model_type is "Part"
         if model_type == "Part":
             self.parts_name_label.pack(pady=5, fill="x")
             self.parts_name_combo.pack(pady=5, fill="x")
             if parts_name == FormatId.PartsName.PLATE:
+                # Show plate combo box if parts_name is PLATE
                 self.plate_label.pack(pady=5, fill="x")
                 self.plate_combo.pack(pady=5, fill="x")
+
                 if plate == FormatId.Plate.ALUMINIUM:
+                    # Show width entry if plate is ALUMINIUM
                     self.width_label.pack(pady=5, fill="x")
                     self.width_entry.pack(pady=5, fill="x")
+                else:
+                    # Hide width entry if plate is not ALUMINIUM
+                    self.width_label.pack_forget()
+                    self.width_entry.pack_forget()
             elif parts_name == FormatId.PartsName.MOTOR:
+                # Show motor combo box if parts_name is MOTOR
                 self.motor_label.pack(pady=5, fill="x")
                 self.motor_combo.pack(pady=5, fill="x")
+
             self.manufacture_method_label.pack(pady=5, fill="x")
-            self.manufacture_method_combo.pack(pady=5, fill="x")
+            self.manufacture_method_combo.pack(pady=5
+        ,fill="x")
 
     def generate_format(self):
-        try:
-            cad_id = CadId(
-                self.system_name_var.get(),
-                self.model_type_var.get(),
-                self.model_order_var.get(),
-                self.model_version_var.get()
-            )
-            format_id = FormatId(
-                self.model_type_var.get(),
-                self.parts_name_var.get(),
-                self.motor_var.get() if self.motor_var.get() else None,
-                self.plate_var.get() if self.plate_var.get() else None,
-                self.manufacture_method_var.get(),
-                self.width_var.get() if self.width_var.get() != -1 else None
-            )
+        format_id = FormatId(
+            self.model_type_var.get(),
+            self.parts_name_var.get(),
+            self.motor_var.get(),
+            self.plate_var.get(),
+            self.manufacture_method_var.get(),
+            self.width_var.get()
+        )
 
-            full_format = f"{cad_id.get_cad_id()}-{format_id.get_format_id()}"
+        cad_id = CadId(
+            self.system_name_var.get(),
+            self.model_type_var.get(),
+            self.model_order_var.get(),
+            self.model_version_var.get()
+        )
+        final_format = cad_id.get_cad_id() + "-" + format_id.get_format_id()
+        output_text = f"Format ID: {final_format.rstrip('-')}"
+        messagebox.showinfo("Generated IDs", output_text)
 
-            pyperclip.copy(full_format)
+        pyperclip.copy(output_text)
 
-            messagebox.showinfo("CAD Format", f"Format Result: {full_format}")
-        except Exception as e:
-            print("Error:", e)
+    def refresh(self):
+        self.update_widgets()
 
 
 if __name__ == "__main__":
