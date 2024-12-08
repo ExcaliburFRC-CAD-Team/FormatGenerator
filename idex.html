@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Format ID Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Format ID Generator</h1>
+        <form id="formatForm">
+            <div>
+                <label for="type">System Name Type:</label>
+                <select id="type" required>
+                    <option value="SYSTEMS1">SYSTEMS1</option>
+                    <option value="ROBOT">ROBOT</option>
+                    <option value="BLOCK_BOTS">BLOCK_BOTS</option>
+                    <option value="PROTOTYPE">PROTOTYPE</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="modelType">Model Type:</label>
+                <select id="modelType" required>
+                    <option value="Main_Assembly">Main Assembly</option>
+                    <option value="Part">Part</option>
+                    <option value="Sub_Assembly">Sub Assembly</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="modelOrder">Model Order:</label>
+                <select id="modelOrder" required>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                </select>
+            </div>            
+
+            <div>
+                <label for="modelVersion">Model Version:</label>
+                <select id="modelVersion" required>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="partsName">Parts Name:</label>
+                <select id="partsName" required>
+                    <option value="PLA">PLA</option>
+                    <option value="PLATE">PLATE</option>
+                    <option value="WHEELS">WHEELS</option>
+                    <option value="MOTOR">MOTOR</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="motor">Motor:</label>
+                <select id="motor">
+                    <option value="">Select Motor</option>
+                    <option value="Neo_Motor">Neo Motor</option>
+                    <option value="Neo_Vortex">Neo Vortex</option>
+                    <option value="Kraken_motor">Kraken Motor</option>
+                    <option value="Baby_NEO">Baby NEO</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="plate">Plate:</label>
+                <select id="plate">
+                    <option value="">Select Plate</option>
+                    <option value="Aluminium">Aluminium</option>
+                    <option value="Wood">Wood</option>
+                    <option value="Polycarbonate">Polycarbonate</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="width">Width:</label>
+                <input type="number" id="width" min="1">
+            </div>
+
+            <div>
+                <label for="manufactureMethod">Manufacture Method:</label>
+                <select id="manufactureMethod" required>
+                    <option value="CNC">CNC</option>
+                    <option value="3D">3D</option>
+                    <option value="LASER">LASER</option>
+                    <option value="MANUAL">MANUAL</option>
+                    <option value="SPONSORS">SPONSORS</option>
+                </select>
+            </div>
+
+            <button type="submit">Generate Format ID</button>
+        </form>
+
+        <h2>Generated Format ID:</h2>
+        <p id="result"></p>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
