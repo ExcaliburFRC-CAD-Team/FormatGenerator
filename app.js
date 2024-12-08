@@ -12,6 +12,11 @@ document.getElementById('formatForm').addEventListener('submit', function(event)
     const systemType = document.getElementById('type').value;
 
     if (modelType === 'Part') {
+        if (partsName === 'MOTOR' && !motor) {
+            alert("You didn't choose Motor.");
+            return;
+        }
+
         if (partsName === 'PLATE' && !plate) {
             alert("You didn't choose Plate.");
             return;
