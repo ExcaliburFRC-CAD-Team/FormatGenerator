@@ -32,12 +32,10 @@ document.getElementById('formatForm').addEventListener('submit', function(event)
         systemType, modelType, modelOrder, modelVersion, partsName, motor, plate, width, manufactureMethod
     );
 
-    document.getElementById('result').innerText = formatId;
+    const resultElement = document.getElementById('result');
+    resultElement.innerText = formatId;
 
     navigator.clipboard.writeText(formatId)
-        .then(() => {
-            alert("Format ID copied to clipboard!");
-        })
         .catch(err => {
             console.error("Failed to copy format ID: ", err);
             alert("Failed to copy format ID. Please try manually copying it.");
