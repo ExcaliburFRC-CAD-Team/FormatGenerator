@@ -52,9 +52,11 @@ function generateFormatId(systemType, modelType, modelOrder, modelVersion, parts
         // Process Part Name only if it's not Main_Assembly
         if (partsName === 'PLATE') {
             if (plate === 'Aluminium' && width > 0) {
-                formatParts.push(`${partsName}${space}${plate}${space}${width}`);
+                // Custom format for Aluminium plate
+                formatParts.push(`${partsName}${width}`);
             } else if (plate !== 'Aluminium') {
-                formatParts.push(`${partsName}${space}${plate}`);  // Include plate name without width for non-Aluminium plates
+                // Include plate name without width for non-Aluminium plates
+                formatParts.push(`${partsName}${space}${plate}`);
             }
         } else if (partsName === 'MOTOR' && motor) {
             formatParts.push(`${partsName}${space}${motor}`);
@@ -115,11 +117,11 @@ function updateFieldVisibility() {
     // Hide Plate if PartsName isn't PLATE
     document.getElementById('plate').parentElement.style.display = partsName === 'PLATE' ? 'block' : 'none';
 
-    // Show motor only if partsName is MOTOR
-    document.getElementById('motor').parentElement.style.display = partsName === 'MOTOR' ? 'block' : 'none';
+    // Show motor only if partsName is MOTOR and modelType is Part
+    document.getElementById('motor').parentElement.style.display = partsName === 'MOTOR' && modelType === 'Part' ? 'block' : 'none';
 
-    // Show width input only if plate is Aluminium
-    document.getElementById('width').parentElement.style.display = plate === 'Aluminium' ? 'block' : 'none';
+    // Show width input only if plate is Aluminium and modelType is Part
+    document.getElementById('width').parentElement.style.display = plate === 'Aluminium' && modelType === 'Part' ? 'block' : 'none';
 
     // Hide Manufacture Method if ModelType == Main_Assembly or Sub_Assembly
     document.getElementById('manufactureMethod').parentElement.style.display = modelType === 'Main_Assembly' || modelType === 'Sub_Assembly' || !partsName ? 'none' : 'block';
